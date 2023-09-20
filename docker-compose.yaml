@@ -1,0 +1,40 @@
+version: "3.2"
+
+services:
+  facturas-api:
+    image: enzost4/facturas-api:0.0.1
+    build:
+      context: ./backend/api/
+    environment:
+      - DATABASE_URL=postgres://postgres:foobarbaz@database:5433/postgres
+    networks:
+      - facturas-backend-net
+    ports:
+      - 8080:3000
+    restart: unless-stopped
+    depends_on:
+      - database
+    volumes:
+      - type: bind
+        source: ./backend/api
+        target: /app
+      - type: volume
+        target: /app/venv
+      - type: volume
+        target: /app/__pycache__
+
+  database:
+    image: postgres:15.1-alpine
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=foobarbaz
+    networks:
+      - facturas-backend-net
+    ports:
+      - 5433:5432
+
+networks:
+  facturas-backend-net:
+volumes:
+  pgdata:
