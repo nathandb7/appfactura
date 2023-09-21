@@ -9,6 +9,7 @@ services:
       - DATABASE_URL=postgres://postgres:foobarbaz@database:5433/postgres
     networks:
       - facturas-backend-net
+      - facturas-frontend-net
     ports:
       - 8080:3000
     restart: unless-stopped
@@ -23,6 +24,24 @@ services:
       - type: volume
         target: /app/__pycache__
 
+  facturas-frontend:
+    image: enzost4/facturas:frontend-0
+    build:
+      context: ./facturas-frontend
+    ports:
+      - 5173:5173
+    networks:
+      - facturas-frontend-net
+    restart: unless-stopped
+    volumes:
+      - type: bind
+        source: ./facturas-frontend
+        target: /app
+      - type: volume
+        target: /app/node_modules
+    depends_on:
+      - facturas-api
+
   database:
     image: postgres:15.1-alpine
     volumes:
@@ -36,5 +55,6 @@ services:
 
 networks:
   facturas-backend-net:
+  facturas-frontend-net:
 volumes:
   pgdata:
