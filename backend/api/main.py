@@ -13,8 +13,6 @@ import jose
 from datetime import datetime, timedelta
 import auth
 
-#from auth import log
-#from passlib.context import 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 API_PREFIX = "/api"
