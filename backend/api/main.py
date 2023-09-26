@@ -13,8 +13,6 @@ import jose
 from datetime import datetime, timedelta
 import auth
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
-
 API_PREFIX = "/api"
 app = FastAPI()
 
@@ -27,22 +25,23 @@ app.add_middleware(CORSMiddleware,
                    allow_headers=["*"])
 
 
-api_router = APIRouter(prefix="/api")
+api_router = APIRouter(prefix=API_PREFIX)
 
 @api_router.get("/hello-world")
 async def test():
     return { "message" : "Hello, World!"}
 
-@api_router.get("/items")
-async def read_items(token: Annotated[str, Depends(oauth2_scheme)]):
-    return {"token" : token}
-
 @api_router.get("/users/me")
-async def read_subscribers(subscriber : auth.User = Depends(auth.get_current_active_user)):
-    return subscriber
+async def get_user(user_validator: auth.UserValidator = Depends(auth.UserValidator)):
+    if user_validator.error:
+        raise user_validator.error
+    return user_validator.user
 
 @api_router.post("/token")
-async def login(form_data : OAuth2PasswordRequestForm = Depends()):
-    return await auth.login(form_data)
+async def login(login_handler: auth.LoginHandler = Depends(auth.LoginHandler)):
+    if login_handler.err:
+        raise login_handler.err
+    return {"access_token": login_handler.access_token, 
+            "token_type": login_handler.token_type}
 
 app.include_router(api_router)
