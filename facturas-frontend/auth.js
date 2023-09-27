@@ -5,7 +5,7 @@ if (!token) {
 
 const app = document.querySelector('#app');
 
-// Función para realizar la solicitud a la API de usuario
+// Función para realizar la solicitud a la API de usuariosdsdsdsd
 async function fetchUserData() {
     try {
         const response = await fetch('/api/users/me', {
